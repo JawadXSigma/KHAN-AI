@@ -79,6 +79,8 @@ cmd({
 },    
 async (conn, mek, m, { from, body, isOwner }) => {
     if (config.ONLINE === 'true') {
-        await conn.sendPresenceUpdate('available', from); // Show as "online"
+        await conn.sendPresenceUpdate('available', from); // Explicitly show online
+    } else {
+        await conn.sendPresenceUpdate('unavailable', from); // Explicitly set to offline
     }
 });
