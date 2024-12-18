@@ -10,8 +10,9 @@ cmd({
   filename: __filename
 }, async (conn, mek, m, { from, quoted, body, args, q, reply }) => {
   try {
-    if (!q) {
-      return reply("Please provide text to convert into fonts.");
+    // Check if the user provided text
+    if (!q || q.trim() === "") {
+      return reply("Please provide text to convert into fonts. Usage: .fancy <text>");
     }
 
     let response = await axios.get('https://www.dark-yasiya-api.site/other/font?text=' + encodeURIComponent(q));
