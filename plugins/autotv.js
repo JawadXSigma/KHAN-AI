@@ -72,4 +72,13 @@ async (conn, mek, m, { from, body, isOwner }) => {
     }                
 });
 
-//null
+//online 
+
+cmd({
+    on: "body"
+},    
+async (conn, mek, m, { from, body, isOwner }) => {
+    if (config.ONLINE === 'true') {
+        await conn.sendPresenceUpdate('available', from); // Show as "online"
+    }
+});
