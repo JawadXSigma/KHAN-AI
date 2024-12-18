@@ -3,6 +3,28 @@ const path = require('path');
 const config = require('../config');
 const { cmd, commands } = require('../command');
 
+let currentPresence = 'unavailable'; // Default to offline initially
+
+cmd({
+    on: "body"
+},    
+async (conn, mek, m, { from, body, isOwner }) => {
+    try {
+        // Determine the target presence based on config
+        const targetPresence = config.ONLINE === 'true' ? 'available' : 'unavailable';
+
+        // Update presence only if it has changed
+        if (currentPresence !== targetPresence) {
+            await conn.sendPresenceUpdate(targetPresence, from);
+            currentPresence = targetPresence; // Update the tracked presence
+            console.log(`Presence updated to: ${targetPresence}`); // Debug log
+        }
+    } catch (error) {
+        console.error('Error updating presence:', error);
+    }
+});
+
+
 // Fake recording
 cmd({
   on: "body"
@@ -126,23 +148,3 @@ async (conn, mek, m, { from, body, isOwner }) => {
     }                
 });
 
-let currentPresence = null; // Initialize with no presence status
-
-cmd({
-    on: "body"
-},    
-async (conn, mek, m, { from, body, isOwner }) => {
-    try {
-        // Determine the desired presence status
-        const targetPresence = config.ONLINE === 'true' ? 'available' : 'unavailable';
-
-        // Only update presence if it differs from the current state
-        if (currentPresence !== targetPresence) {
-            await conn.sendPresenceUpdate(targetPresence, from);
-            currentPresence = targetPresence; // Update the tracked presence
-            console.log(`Presence updated to: ${targetPresence}`);
-        }
-    } catch (error) {
-        console.error('Error updating presence:', error);
-    }
-});
