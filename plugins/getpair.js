@@ -1,4 +1,4 @@
-const axios = require('axios');
+const fetch = require('node-fetch');
 const { cmd } = require('../command'); // Importing cmd from command.js
 
 // Get pair code command handler
@@ -10,7 +10,7 @@ const getPairCode = async (m, reply, conn) => {
     const chat = m.from;
     const now = Date.now();
 
-    // Check for cooldown
+    // Cooldown check
     const lastRequest = cooldown.get(sender);
     if (sender !== "923092668108@s.whatsapp.net" && lastRequest && now - lastRequest < 300000) {
       const remainingTime = 300000 - (now - lastRequest);
@@ -21,19 +21,26 @@ const getPairCode = async (m, reply, conn) => {
 
     // Validate phone number argument
     if (!args[0]) {
-      return reply('Please provide a phone number.\n*Example:* `.getpair 92310344XXXX`');
+      return reply('Please provide a phone number.\n*Example:* `.getpair 923092668108`');
     }
 
     const phoneNumber = encodeURIComponent(args[0]);
-    const apiUrl = `https://prince-session-base64.onrender.com/code?number=${phoneNumber}`;
+    const apiUrl = `https://short-pair-for-heorku.onrender.com/pair?phone=${phoneNumber}`;
 
     reply('Fetching your pairing code. Please wait...');
 
     // Fetch pairing code
-    const { data } = await axios.get(apiUrl);
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server error: ${response.statusText}. Details: ${errorText}`);
+    }
+
+    const data = await response.json();
+
     if (data.code) {
       const pairCode = data.code;
-      const message = `*⚡Pairing Code⚡*\n\n💬 A verification code has been sent to your phone number. Please check your phone and copy this code to pair it and get your Prince bot session ID.\n\n*🔢 Code:* \`${pairCode}\`\n*_Copy it from below_*`;
+      const message = `*⛲Pairing Code⛲*\n\n💬 A verification code has been sent to your phone number. Please check your phone and copy this code to pair it and get your Prince bot session ID.\n\n*🔢 Code:* \`${pairCode}\`\n*_Copy it from below_*`;
 
       const imagePayload = {
         url: 'https://envs.sh/wlR.jpg',
@@ -53,7 +60,7 @@ const getPairCode = async (m, reply, conn) => {
   }
 };
 
-// Register .getpair command
+// Register the .getpair command
 cmd({
   pattern: 'getpair', // Command trigger
   desc: 'Fetch pairing code',
