@@ -1,1 +1,134 @@
-const _0x25d9ba=_0x2f48;function _0x12e5(){const _0x590e98=['3FTiMGJ','\x0a\x0a>\x20*BY\x20JAWADTECHX*','1507192ssqGSN','fancy','2543330oplKUf','data','*KHAN-AI\x20FANCY\x20FONTS*:\x0a\x0a','1041985FvzwVk','9TUWOrF','10542cvOlfX','../command','99834NTUFIn',':*\x0a','5gNSfmQ','result','tools','An\x20error\x20occurred\x20while\x20fetching\x20fonts.','join','Error\x20fetching\x20fonts.\x20Please\x20try\x20again\x20later.','10472964UjqnKy','axios','status','Convert\x20text\x20into\x20various\x20fonts.','get','908tQjTXY','style','46160444bdLeSd','12WDgvWB','error'];_0x12e5=function(){return _0x590e98;};return _0x12e5();}(function(_0x133efd,_0x3a044d){const _0x385af1=_0x2f48,_0x5a8e1a=_0x133efd();while(!![]){try{const _0x39c6a7=-parseInt(_0x385af1(0xf4))/0x1*(parseInt(_0x385af1(0xe2))/0x2)+-parseInt(_0x385af1(0xfd))/0x3*(parseInt(_0x385af1(0xef))/0x4)+parseInt(_0x385af1(0xe4))/0x5*(-parseInt(_0x385af1(0xea))/0x6)+-parseInt(_0x385af1(0xfb))/0x7+parseInt(_0x385af1(0xf6))/0x8*(-parseInt(_0x385af1(0xfc))/0x9)+-parseInt(_0x385af1(0xf8))/0xa+parseInt(_0x385af1(0xf1))/0xb*(parseInt(_0x385af1(0xf2))/0xc);if(_0x39c6a7===_0x3a044d)break;else _0x5a8e1a['push'](_0x5a8e1a['shift']());}catch(_0x33d690){_0x5a8e1a['push'](_0x5a8e1a['shift']());}}}(_0x12e5,0xdea16));const {cmd}=require(_0x25d9ba(0xe1)),axios=require(_0x25d9ba(0xeb));function _0x2f48(_0x34bea7,_0x398b8e){const _0x12e575=_0x12e5();return _0x2f48=function(_0x2f48eb,_0x11d9ab){_0x2f48eb=_0x2f48eb-0xe1;let _0x24dedc=_0x12e575[_0x2f48eb];return _0x24dedc;},_0x2f48(_0x34bea7,_0x398b8e);}cmd({'pattern':_0x25d9ba(0xf7),'alias':['font',_0x25d9ba(0xf0)],'react':'✍️','desc':_0x25d9ba(0xed),'category':_0x25d9ba(0xe6),'filename':__filename},async(_0x41a061,_0x282c2e,_0x46007f,{from:_0x159b75,quoted:_0x275809,body:_0x7484c6,args:_0x435aaa,q:_0x4c8986,reply:_0x1dd17f})=>{const _0x200031=_0x25d9ba;try{if(!_0x4c8986)return _0x1dd17f('Please\x20provide\x20text\x20to\x20convert\x20into\x20fonts.');let _0x33ed8c=await axios[_0x200031(0xee)]('https://www.dark-yasiya-api.site/other/font?text='+encodeURIComponent(_0x4c8986)),_0x2d5f4c=_0x33ed8c[_0x200031(0xf9)];if(!_0x2d5f4c[_0x200031(0xec)])return _0x1dd17f(_0x200031(0xe9));let _0x6adb97=_0x2d5f4c['result']['map'](_0x2dd67d=>'*'+_0x2dd67d['name']+_0x200031(0xe3)+_0x2dd67d[_0x200031(0xe5)])[_0x200031(0xe8)]('\x0a\x0a');_0x1dd17f(_0x200031(0xfa)+_0x6adb97+_0x200031(0xf5));}catch(_0x59a087){console[_0x200031(0xf3)](_0x59a087),_0x1dd17f(_0x200031(0xe7));}});
+const _0x25d9ba = _0x2f48;
+function _0x12e5() {
+  const _0x590e98 = [
+    '3FTiMGJ',
+    '\x0a\x0a>\x20*BY\x20JAWADTECHX*',
+    '1507192ssqGSN',
+    'fancy',
+    '2543330oplKUf',
+    'data',
+    '*KHAN-AI\x20FANCY\x20FONTS*:\x0a\x0a',
+    '1041985FvzwVk',
+    '9TUWOrF',
+    '10542cvOlfX',
+    '../command',
+    '99834NTUFIn',
+    ':*\x0a',
+    '5gNSfmQ',
+    'result',
+    'tools',
+    'An\x20error\x20occurred\x20while\x20fetching\x20fonts.',
+    'join',
+    'Error\x20fetching\x20fonts.\x20Please\x20try\x20again\x20later.',
+    '10472964UjqnKy',
+    'axios',
+    'status',
+    'Convert\x20text\x20into\x20various\x20fonts.',
+    'get',
+    '908tQjTXY',
+    'style',
+    '46160444bdLeSd',
+    '12WDgvWB',
+    'error',
+  ];
+  _0x12e5 = function () {
+    return _0x590e98;
+  };
+  return _0x12e5();
+}
+(function (_0x133efd, _0x3a044d) {
+  const _0x385af1 = _0x2f48,
+    _0x5a8e1a = _0x133efd();
+  while (!![]) {
+    try {
+      const _0x39c6a7 =
+        (-parseInt(_0x385af1(0xf4)) / 0x1) *
+          (parseInt(_0x385af1(0xe2)) / 0x2) +
+        -parseInt(_0x385af1(0xfd)) / 0x3 *
+          (parseInt(_0x385af1(0xef)) / 0x4) +
+        parseInt(_0x385af1(0xe4)) / 0x5 *
+          (-parseInt(_0x385af1(0xea)) / 0x6) +
+        -parseInt(_0x385af1(0xfb)) / 0x7 +
+        parseInt(_0x385af1(0xf6)) / 0x8 *
+          (-parseInt(_0x385af1(0xfc)) / 0x9) +
+        -parseInt(_0x385af1(0xf8)) / 0xa +
+        (parseInt(_0x385af1(0xf1)) / 0xb) *
+          (parseInt(_0x385af1(0xf2)) / 0xc);
+      if (_0x39c6a7 === _0x3a044d) break;
+      else _0x5a8e1a.push(_0x5a8e1a.shift());
+    } catch (_0x33d690) {
+      _0x5a8e1a.push(_0x5a8e1a.shift());
+    }
+  }
+})(_0x12e5, 0xdea16);
+const { cmd } = require(_0x25d9ba(0xe1)),
+  axios = require(_0x25d9ba(0xeb));
+function _0x2f48(_0x34bea7, _0x398b8e) {
+  const _0x12e575 = _0x12e5();
+  return (
+    (_0x2f48 = function (_0x2f48eb, _0x11d9ab) {
+      _0x2f48eb = _0x2f48eb - 0xe1;
+      let _0x24dedc = _0x12e575[_0x2f48eb];
+      return _0x24dedc;
+    }),
+    _0x2f48(_0x34bea7, _0x398b8e)
+  );
+}
+cmd(
+  {
+    pattern: _0x25d9ba(0xf7),
+    alias: ['font', _0x25d9ba(0xf0)],
+    react: '✍️',
+    desc: _0x25d9ba(0xed),
+    category: _0x25d9ba(0xe6),
+    filename: __filename,
+  },
+  async (
+    _0x41a061,
+    _0x282c2e,
+    _0x46007f,
+    { from: _0x159b75, quoted: _0x275809, body: _0x7484c6, args: _0x435aaa, q: _0x4c8986, reply: _0x1dd17f }
+  ) => {
+    const _0x200031 = _0x25d9ba;
+    try {
+      if (!_0x4c8986)
+        return _0x1dd17f(
+          'Please\x20provide\x20text\x20to\x20convert\x20into\x20fonts.'
+        );
+      let _0x33ed8c = await axios[_0x200031(0xee)](
+          'https://www.dark-yasiya-api.site/other/font?text=' +
+          encodeURIComponent(_0x4c8986)
+        ),
+        _0x2d5f4c = _0x33ed8c[_0x200031(0xf9)];
+      if (!_0x2d5f4c[_0x200031(0xec)])
+        return _0x1dd17f(_0x200031(0xe9));
+      let _0x6adb97 = _0x2d5f4c['result']
+        ['map'](
+          (_0x2dd67d) =>
+            '*' + _0x2dd67d['name'] + _0x200031(0xe3) + _0x2dd67d[_0x200031(0xe5)]
+        )
+        [_0x200031(0xe8)]('\x0a\x0a');
+      _0x1dd17f(
+        _0x200031(0xfa) +
+          _0x6adb97 +
+          _0x200031(0xf5),
+        null,
+        {
+          contextInfo: {
+            mentionedJid: [_0x159b75],
+            forwardingScore: 999,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+              newsletterJid: '120363354023106228@newsletter',
+              newsletterName: 'JawadTechX',
+              serverMessageId: 143,
+            },
+          },
+        }
+      );
+    } catch (_0x59a087) {
+      console[_0x200031(0xf3)](_0x59a087),
+      _0x1dd17f(_0x200031(0xe7));
+    }
+  }
+);
