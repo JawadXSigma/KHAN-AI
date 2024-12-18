@@ -1,21 +1,19 @@
 const fs = require('fs');
 const path = require('path');
-const config = require('../config')
-const {cmd , commands} = require('../command')
+const config = require('../config');
+const { cmd, commands } = require('../command');
 
-
-//fake recording
+// Fake recording
 cmd({
   on: "body"
 },    
 async (conn, mek, m, { from, body, isOwner }) => {       
- if (config.FAKE_RECORDING === 'true') {
-                await conn.sendPresenceUpdate('recording', from);
-            }
-         } 
-   );
+    if (config.FAKE_RECORDING === 'true') {
+        await conn.sendPresenceUpdate('recording', from);
+    }
+});
 
-//auto_voice
+// Auto voice
 cmd({
   on: "body"
 },    
@@ -24,9 +22,7 @@ async (conn, mek, m, { from, body, isOwner }) => {
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     for (const text in data) {
         if (body.toLowerCase() === text.toLowerCase()) {
-            
             if (config.AUTO_VOICE === 'true') {
-                //if (isOwner) return;        
                 await conn.sendPresenceUpdate('recording', from);
                 await conn.sendMessage(from, { audio: { url: data[text] }, mimetype: 'audio/mpeg', ptt: true }, { quoted: mek });
             }
@@ -34,7 +30,7 @@ async (conn, mek, m, { from, body, isOwner }) => {
     }                
 });
 
-//auto sticker 
+// Auto sticker
 cmd({
   on: "body"
 },    
@@ -43,17 +39,14 @@ async (conn, mek, m, { from, body, isOwner }) => {
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     for (const text in data) {
         if (body.toLowerCase() === text.toLowerCase()) {
-            
             if (config.AUTO_STICKER === 'true') {
-                //if (isOwner) return;        
-                await conn.sendMessage(from,{sticker: { url : data[text]},package: 'SILENT LOVER'},{ quoted: mek })   
-            
+                await conn.sendMessage(from, { sticker: { url: data[text] }, package: 'SILENT LOVER' }, { quoted: mek });   
             }
         }
     }                
 });
 
-//auto reply 
+// Auto reply
 cmd({
   on: "body"
 },    
@@ -62,25 +55,32 @@ async (conn, mek, m, { from, body, isOwner }) => {
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     for (const text in data) {
         if (body.toLowerCase() === text.toLowerCase()) {
-            
             if (config.AUTO_REPLY === 'true') {
-                //if (isOwner) return;        
-                await m.reply(data[text])
-            
+                await m.reply(data[text]);
             }
         }
     }                
 });
 
-//online 
+// Online presence management
+let currentPresence = 'unavailable'; // Track the current presence status
 
 cmd({
     on: "body"
 },    
 async (conn, mek, m, { from, body, isOwner }) => {
-    if (config.ONLINE === 'true') {
-        await conn.sendPresenceUpdate('available', from); // Explicitly show online
-    } else {
-        await conn.sendPresenceUpdate('unavailable', from); // Explicitly set to offline
+    try {
+        // Determine the target presence based on config.ONLINE
+        const targetPresence = config.ONLINE === 'true' ? 'available' : 'unavailable';
+        if (currentPresence !== targetPresence) {
+            // Update presence only if it has changed
+            await conn.sendPresenceUpdate(targetPresence, from);
+            currentPresence = targetPresence; // Track the current state
+        }
+
+        // Optional: Log status changes for debugging
+        console.log(`Presence updated to: ${targetPresence}`);
+    } catch (error) {
+        console.error('Error in updating presence:', error);
     }
 });
