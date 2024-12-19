@@ -1,28 +1,15 @@
 const fetch = require('node-fetch');
-const decodeJid = require('./handler'); // Import the helper function
-const { cmd } = require('../command'); // Importing cmd from command.js
+const { decodeJid } = require('./handler'); // Import decodeJid from handler.js
+const { cmd } = require('../command'); // Assuming you have a command handler
 
-// Get pair code command handler
 const getPairCode = async (m, reply, conn) => {
-  const cooldown = new Map();
   try {
-    const args = m.body.split(' ').slice(1); // Extract arguments after the command
-    const sender = decodeJid(m.sender); // Safely decode the JID
-    const chat = m.from;
-    const now = Date.now();
+    const args = m.body.split(' ').slice(1);
+    const sender = decodeJid(m.sender); // Use decodeJid to decode sender
+    if (!sender) return reply('Failed to decode your JID.');
 
-    // Cooldown check
-    const lastRequest = cooldown.get(sender);
-    if (sender !== "923448149931@s.whatsapp.net" && lastRequest && now - lastRequest < 300000) {
-      const remainingTime = 300000 - (now - lastRequest);
-      const minutes = Math.floor(remainingTime / 60000);
-      const seconds = ((remainingTime % 60000) / 1000).toFixed(0);
-      return reply(`Please wait ${minutes} minute(s) and ${seconds} second(s) before requesting again.`);
-    }
-
-    // Validate phone number argument
     if (!args[0]) {
-      return reply('Please provide a phone number.\n*Example:* `.getpair 923448149931`');
+      return reply('Please provide a phone number.\nExample: `.getpair 923448149931`');
     }
 
     const phoneNumber = encodeURIComponent(args[0]);
@@ -30,44 +17,33 @@ const getPairCode = async (m, reply, conn) => {
 
     reply('Fetching your pairing code. Please wait...');
 
-    // Fetch pairing code
     const response = await fetch(apiUrl);
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Server error: ${response.statusText}. Details: ${errorText}`);
+      throw new Error(`Failed to fetch pairing code: ${response.statusText}`);
     }
 
     const data = await response.json();
-
     if (data.code) {
       const pairCode = data.code;
-      const message = `*⚡Pairing Code⚡*\n\n💜 A verification code has been sent to your phone number. Please check your phone and copy this code to pair it and get your Prince bot session ID.\n\n*🔢 Code:* \`${pairCode}\`\n*_Copy it from below_*`;
+      const message = `*⚡Pairing Code⚡*\n\n🔢 Code: \`${pairCode}\``;
 
-      const imagePayload = {
-        url: 'https://envs.sh/wlR.jpg',
-      };
-
-      await conn.sendMessage(chat, { image: imagePayload, caption: message }); // Send image with caption
-      reply(`${pairCode}`); // Send plain code as a follow-up message
-      cooldown.set(sender, now); // Update cooldown
-    } else if (data.error) {
-      reply(`Error: ${data.error}`);
+      await conn.sendMessage(m.chat, { text: message });
+      reply(`${pairCode}`);
     } else {
-      reply(`Unexpected response structure: ${JSON.stringify(data)}`);
+      reply(`Error: ${data.error || 'Unknown error occurred'}`);
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in getPairCode:', error);
     reply(`Error: ${error.message}`);
   }
 };
 
-// Register the .getpair command
+// Register the command
 cmd({
-  pattern: 'getpair', // Command trigger
+  pattern: 'getpair',
   desc: 'Fetch pairing code',
   category: 'tools',
-  filename: __filename,
 },
 async (conn, mek, m, { reply }) => {
-  await getPairCode(m, reply, conn); // Pass conn to handle the message sending
+  await getPairCode(m, reply, conn);
 });
