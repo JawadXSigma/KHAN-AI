@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const decodeJid = require('./handler'); // Import the helper function
 const { cmd } = require('../command'); // Importing cmd from command.js
 
 // Get pair code command handler
@@ -6,13 +7,13 @@ const getPairCode = async (m, reply, conn) => {
   const cooldown = new Map();
   try {
     const args = m.body.split(' ').slice(1); // Extract arguments after the command
-    const sender = m.sender;
+    const sender = decodeJid(m.sender); // Safely decode the JID
     const chat = m.from;
     const now = Date.now();
 
     // Cooldown check
     const lastRequest = cooldown.get(sender);
-    if (sender !== "923092668108@s.whatsapp.net" && lastRequest && now - lastRequest < 300000) {
+    if (sender !== "923448149931@s.whatsapp.net" && lastRequest && now - lastRequest < 300000) {
       const remainingTime = 300000 - (now - lastRequest);
       const minutes = Math.floor(remainingTime / 60000);
       const seconds = ((remainingTime % 60000) / 1000).toFixed(0);
@@ -21,7 +22,7 @@ const getPairCode = async (m, reply, conn) => {
 
     // Validate phone number argument
     if (!args[0]) {
-      return reply('Please provide a phone number.\n*Example:* `.getpair 923092668108`');
+      return reply('Please provide a phone number.\n*Example:* `.getpair 923448149931`');
     }
 
     const phoneNumber = encodeURIComponent(args[0]);
@@ -40,7 +41,7 @@ const getPairCode = async (m, reply, conn) => {
 
     if (data.code) {
       const pairCode = data.code;
-      const message = `*⛲Pairing Code⛲*\n\n💬 A verification code has been sent to your phone number. Please check your phone and copy this code to pair it and get your Prince bot session ID.\n\n*🔢 Code:* \`${pairCode}\`\n*_Copy it from below_*`;
+      const message = `*⚡Pairing Code⚡*\n\n💜 A verification code has been sent to your phone number. Please check your phone and copy this code to pair it and get your Prince bot session ID.\n\n*🔢 Code:* \`${pairCode}\`\n*_Copy it from below_*`;
 
       const imagePayload = {
         url: 'https://envs.sh/wlR.jpg',
