@@ -7,9 +7,8 @@ function convertToBool(text, fault = 'true') {
 module.exports = {
 SESSION_ID: process.env.SESSION_ID || "73BGHZKQ#4b9ox0ncLzEk5zcbMiszdXNYgDE3kXyKSLyVt_WtICs",
 // add your Session Id 
-ONLINE: process.env.ONLINE || "false",
+PREFIX: process.env.PREFIX || ".",
 // add your prifix for bot
-PREFIX: process.env.PREFIX || ".",    
 BOT_NAME: process.env.BOT_NAME || "KHAN-AI",
 // add bot namw here for menu
 DELETE_LINKS: process.env.DELETE_LINKS || "false",
@@ -50,6 +49,11 @@ HEART_REACT: process.env.HEART_REACT || "false",
 // make this true or false for heart reactions only 
 OWNER_REACT: process.env.OWNER_REACT || "false",
 // make it true or fasle for only react on owner msg only 
-FAKE_RECORDING: process.env.FAKE_RECORDING || "false"
+ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "false",
+NULL: process.env.NULL || "false",
+AUTO_TYPING: process.env.AUTO_TYPING || "true",
+FREEZE: process.env.FREEZE || "false", 
+ALWAYS_OFFLINE: process.env.ALWAYS_OFFLINE || "false",    
+AUTO_RECORDING: process.env.AUTO_RECORDING || "false"
 // make it true for auto recoding 
 };
