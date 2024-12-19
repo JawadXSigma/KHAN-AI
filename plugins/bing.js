@@ -2,8 +2,8 @@ const { cmd } = require('../command');
 const fetch = require('node-fetch');
 
 cmd({
-    pattern: "ai",
-    alias: ["gpt", "bot"],
+    pattern: "bing",
+    alias: ["jarvis", "dj"],
     react: "🤖",
     desc: "Chat with AI using a custom API.",
     category: "main",
@@ -11,7 +11,9 @@ cmd({
 },
 async (conn, mek, m, { q, reply }) => {
     try {
-        if (!q) return reply("❗ Please provide a prompt for the AI to respond to.");
+        if (!q) {
+            return reply("❗ Please provide a prompt for the AI to respond to.");
+        }
 
         const username = m.sender.split('@')[0]; // Extract sender username
         const prompt = encodeURIComponent(q); // Encode the user query
@@ -26,8 +28,8 @@ async (conn, mek, m, { q, reply }) => {
         console.log("API Response:", response); // Log the full response
 
         if (!response.result) {
-            console.error("No 'result' field in response:", response);
-            throw "No result found.";
+            console.error("API Response does not contain 'result':", response);
+            throw "The API returned an invalid response.";
         }
 
         const replyText = response.result;
