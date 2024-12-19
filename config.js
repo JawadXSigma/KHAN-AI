@@ -10,6 +10,7 @@ SESSION_ID: process.env.SESSION_ID || "73BGHZKQ#4b9ox0ncLzEk5zcbMiszdXNYgDE3kXyK
 PREFIX: process.env.PREFIX || ".",
 // add your prifix for bot
 BOT_NAME: process.env.BOT_NAME || "KHAN-AI",
+ANTI_DELETE: process.env.ANTI_DELETE || "true",
 // add bot namw here for menu
 DELETE_LINKS: process.env.DELETE_LINKS || "false",
 // automatic delete links witho remove member 
