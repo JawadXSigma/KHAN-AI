@@ -87,16 +87,11 @@ conn.ev.on('creds.update', saveCreds)
 //=============readstatus=======
       
 conn.ev.on('messages.upsert', async(mek) => {
-  mek = mek.messages[0]
-  if (!mek.message) return
-  mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
-    await conn.readMessages([mek.key])
-  }        
-if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
-const user = mek.key.participant
-const text = `${config.AUTO_STATUS__MSG}`
-await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
+mek = mek.messages[0]
+if (!mek.message) return	
+mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
+if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_READ_STATUS === "true"){
+await conn.readMessages([mek.key])
 }
 const m = sms(conn, mek)
 const type = getContentType(mek.message)
@@ -233,103 +228,40 @@ if(!isOwner && isGroup && config.MODE === "groups") return
  
 // take commands 
                
-        const events = require('./command')
-        const cmdName = isCmd ? body.slice(1).trim().split(" ")[0].toLowerCase() : false;
-        if (isCmd) {
-            const cmd = events.commands.find((cmd) => cmd.pattern === (cmdName)) || events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName))
-            if (cmd) {
-                if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key } })
+const events = require('./command')
+const cmdName = isCmd ? body.slice(1).trim().split(" ")[0].toLowerCase() : false;
+if (isCmd) {
+const cmd = events.commands.find((cmd) => cmd.pattern === (cmdName)) || events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName))
+if (cmd) {
+if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key }})
 
-                try {
-                    cmd.function(conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply });
-                } catch (e) {
-                    console.error("[PLUGIN ERROR] " + e);
-                }
-            }
-        }
-        events.commands.map(async (command) => {
-            if (body && command.on === "body") {
-                command.function(conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply })
-            } else if (mek.q && command.on === "text") {
-                command.function(conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply })
-            } else if (
-                (command.on === "image" || command.on === "photo") &&
-                mek.type === "imageMessage"
-            ) {
-                command.function(conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply })
-            } else if (
-                command.on === "sticker" &&
-                mek.type === "stickerMessage"
-            ) {
-                command.function(conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply })
-            }
-        });
-    })
+try {
+cmd.function(conn, mek, m,{from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply});
+} catch (e) {
+console.error("[PLUGIN ERROR] " + e);
+}
+}
+}
+events.commands.map(async(command) => {
+if (body && command.on === "body") {
+command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
+} else if (mek.q && command.on === "text") {
+command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
+} else if (
+(command.on === "image" || command.on === "photo") &&
+mek.type === "imageMessage"
+) {
+command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
+} else if (
+command.on === "sticker" &&
+mek.type === "stickerMessage"
+) {
+command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
+}});
 
-const { downloadMediaMessage } = require('@whiskeysockets/baileys');
+})
+}
 
-//--------------------| SAHAS-MD Anti Delete |--------------------//
-conn.ev.on('messages.delete', async (message) => {
-    if (config.ANTI_DELETE === "true" && message.keys[0]?.remoteJid.endsWith('@g.us')) {
-        try {
-            const messageId = message.keys[0]?.id;
-            const remoteJid = message.keys[0]?.remoteJid;
-            const participant = message.keys[0]?.participant || remoteJid;
-
-            // Load the deleted message
-            const deletedMessage = await conn.loadMessage(remoteJid, messageId);
-
-            if (deletedMessage) {
-                const deletedContent = deletedMessage.message;
-
-                // Prepare notification text
-                let notificationText = `🚨 *Deleted Message Detected* 🚨\n\n`;
-                notificationText += `*From:* @${participant.split('@')[0]}\n`;
-
-                if (deletedContent) {
-                    if (deletedContent.conversation) {
-                        notificationText += `*Message:* ${deletedContent.conversation}`;
-                    } else if (deletedContent.extendedTextMessage) {
-                        notificationText += `*Message:* ${deletedContent.extendedTextMessage.text}`;
-                    } else if (deletedContent.imageMessage) {
-                        notificationText += `*Message:* [Image with caption: ${deletedContent.imageMessage.caption || 'No Caption'}]`;
-                    } else if (deletedContent.videoMessage) {
-                        notificationText += `*Message:* [Video with caption: ${deletedContent.videoMessage.caption || 'No Caption'}]`;
-                    } else {
-                        notificationText += `*Message:* [${Object.keys(deletedContent)[0]} message]`;
-                    }
-                } else {
-                    notificationText += `*Message:* [Unable to retrieve deleted content]`;
-                }
-
-                // Send notification
-                await conn.sendMessage(remoteJid, { 
-                    text: notificationText, 
-                    mentions: [participant] 
-                });
-
-                // Send media if it's an image or video
-                if (deletedContent && (deletedContent.imageMessage || deletedContent.videoMessage)) {
-                    const media = await downloadMediaMessage(deletedMessage, 'buffer');
-                    if (deletedContent.imageMessage) {
-                        await conn.sendMessage(remoteJid, { 
-                            image: media, 
-                            caption: 'Deleted media' 
-                        });
-                    } else if (deletedContent.videoMessage) {
-                        await conn.sendMessage(remoteJid, { 
-                            video: media, 
-                            caption: 'Deleted media' 
-                        });
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Error handling deleted message:', error);
-        }
-    }
-});
-        
 app.get("/", (req, res) => {
 res.send("KHAN-AI STARTED ✅");
 });
