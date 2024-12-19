@@ -266,49 +266,70 @@ if(!isOwner && isGroup && config.MODE === "groups") return
         });
     })
 
-//--------------------| SAHAS-MD Anti Del |--------------------//
+const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 
+//--------------------| SAHAS-MD Anti Delete |--------------------//
 conn.ev.on('messages.delete', async (message) => {
-    if (config.ANTI_DELETE === "true" && message.remoteJid.endsWith('@g.us')) {
+    if (config.ANTI_DELETE === "true" && message.keys[0]?.remoteJid.endsWith('@g.us')) {
         try {
-            const deletedMessage = await conn.loadMessage(message.remoteJid, message.id)
-            if (deletedMessage) {
-                const deletedContent = deletedMessage.message
+            const messageId = message.keys[0]?.id;
+            const remoteJid = message.keys[0]?.remoteJid;
+            const participant = message.keys[0]?.participant || remoteJid;
 
-                let notificationText = `🚨 Deleted Message Detected 🚨\n\n`
-                notificationText += `From: ${deletedMessage.pushName} (@${deletedMessage.participant.split('@')[0]})\n`
+            // Load the deleted message
+            const deletedMessage = await conn.loadMessage(remoteJid, messageId);
+
+            if (deletedMessage) {
+                const deletedContent = deletedMessage.message;
+
+                // Prepare notification text
+                let notificationText = `🚨 *Deleted Message Detected* 🚨\n\n`;
+                notificationText += `*From:* @${participant.split('@')[0]}\n`;
 
                 if (deletedContent) {
                     if (deletedContent.conversation) {
-                        notificationText += `Message: ${deletedContent.conversation}`
+                        notificationText += `*Message:* ${deletedContent.conversation}`;
                     } else if (deletedContent.extendedTextMessage) {
-                        notificationText += `Message: ${deletedContent.extendedTextMessage.text}`
+                        notificationText += `*Message:* ${deletedContent.extendedTextMessage.text}`;
                     } else if (deletedContent.imageMessage) {
-                        notificationText += `Message: [Image with caption: ${deletedContent.imageMessage.caption}]`
+                        notificationText += `*Message:* [Image with caption: ${deletedContent.imageMessage.caption || 'No Caption'}]`;
                     } else if (deletedContent.videoMessage) {
-                        notificationText += `Message: [Video with caption: ${deletedContent.videoMessage.caption}]`
+                        notificationText += `*Message:* [Video with caption: ${deletedContent.videoMessage.caption || 'No Caption'}]`;
                     } else {
-                        notificationText += `Message: [${Object.keys(deletedContent)[0]} message]`
+                        notificationText += `*Message:* [${Object.keys(deletedContent)[0]} message]`;
                     }
                 } else {
-                    notificationText += `Message: [Unable to retrieve deleted content]`
+                    notificationText += `*Message:* [Unable to retrieve deleted content]`;
                 }
 
-                // Send notification to the chat where the message was deleted
-                await conn.sendMessage(message.remoteJid, { text: notificationText })
+                // Send notification
+                await conn.sendMessage(remoteJid, { 
+                    text: notificationText, 
+                    mentions: [participant] 
+                });
 
-                // If it's an image or video, send the media as well
+                // Send media if it's an image or video
                 if (deletedContent && (deletedContent.imageMessage || deletedContent.videoMessage)) {
-                    const media = await downloadMediaMessage(deletedMessage, 'buffer')
-                    await conn.sendMessage(message.remoteJid, { image: media, caption: 'Deleted media' })
+                    const media = await downloadMediaMessage(deletedMessage, 'buffer');
+                    if (deletedContent.imageMessage) {
+                        await conn.sendMessage(remoteJid, { 
+                            image: media, 
+                            caption: 'Deleted media' 
+                        });
+                    } else if (deletedContent.videoMessage) {
+                        await conn.sendMessage(remoteJid, { 
+                            video: media, 
+                            caption: 'Deleted media' 
+                        });
+                    }
                 }
             }
         } catch (error) {
-            console.error('Error handling deleted message:', error)
+            console.error('Error handling deleted message:', error);
         }
     }
-})
-}
+});
+        
 app.get("/", (req, res) => {
 res.send("KHAN-AI STARTED ✅");
 });
