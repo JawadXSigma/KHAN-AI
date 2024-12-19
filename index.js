@@ -267,6 +267,69 @@ command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, i
 })
 }
 
+
+conn.ev.on('messages.delete', async (message) => {
+    try {
+        if (config.ANTI_DELETE === "true" && message.remoteJid.endsWith('@g.us')) {
+            // Load the deleted message
+            const deletedMessage = await conn.loadMessage(message.remoteJid, message.id);
+
+            if (deletedMessage) {
+                const deletedContent = deletedMessage.message;
+                const participant = deletedMessage.key.participant || 'unknown';
+                const senderNumber = participant.split('@')[0];
+                const pushName = deletedMessage.pushName || 'Unknown';
+
+                // Prepare notification text
+                let notificationText = `🚨 *Deleted Message Detected* 🚨\n\n`;
+                notificationText += `*From:* ${pushName} (@${senderNumber})\n`;
+                notificationText += `*Chat:* ${message.remoteJid}\n`;
+
+                // Identify deleted content type
+                if (deletedContent) {
+                    if (deletedContent.conversation) {
+                        // Text message
+                        notificationText += `*Message:* ${deletedContent.conversation}`;
+                        await conn.sendMessage(message.remoteJid, { text: notificationText });
+                    } else if (deletedContent.extendedTextMessage) {
+                        // Extended text message
+                        notificationText += `*Message:* ${deletedContent.extendedTextMessage.text}`;
+                        await conn.sendMessage(message.remoteJid, { text: notificationText });
+                    } else if (deletedContent.imageMessage || deletedContent.videoMessage || deletedContent.documentMessage) {
+                        // Media message already handled
+                        notificationText += `*Message:* [Deleted Media Detected]`;
+                        await conn.sendMessage(message.remoteJid, { text: notificationText });
+
+                        const mediaType = deletedContent.imageMessage
+                            ? 'image'
+                            : deletedContent.videoMessage
+                            ? 'video'
+                            : 'document';
+
+                        const media = await conn.downloadMediaMessage(deletedMessage);
+                        const caption = `Deleted Media: ${mediaType}`;
+
+                        await conn.sendMessage(message.remoteJid, {
+                            [mediaType]: media,
+                            caption,
+                        });
+                    } else {
+                        // Unsupported message type
+                        notificationText += `*Message:* [Unsupported message type: ${Object.keys(deletedContent)[0]}]`;
+                        await conn.sendMessage(message.remoteJid, { text: notificationText });
+                    }
+                } else {
+                    // No retrievable content
+                    notificationText += `*Message:* [Unable to retrieve deleted content]`;
+                    await conn.sendMessage(message.remoteJid, { text: notificationText });
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error processing deleted message:', error);
+    }
+});
+
 app.get("/", (req, res) => {
 res.send("KHAN-AI STARTED ✅");
 });
