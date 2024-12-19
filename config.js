@@ -50,8 +50,8 @@ HEART_REACT: process.env.HEART_REACT || "false",
 OWNER_REACT: process.env.OWNER_REACT || "false",
 // make it true or fasle for only react on owner msg only 
 ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "false",
-NULL: process.env.NULL || "false",
-AUTO_TYPING: process.env.AUTO_TYPING || "true",
+NULL: process.env.NULL || "true",
+AUTO_TYPING: process.env.AUTO_TYPING || "false",
 FREEZE: process.env.FREEZE || "false", 
 ALWAYS_OFFLINE: process.env.ALWAYS_OFFLINE || "false",    
 AUTO_RECORDING: process.env.AUTO_RECORDING || "false"
