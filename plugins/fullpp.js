@@ -1,41 +1,49 @@
-const { cmd, commands } = require('../command');
-const yts = require('yt-search');
-const { exec } = require('child_process');
+const config = require("../config"); 
+const { cmd, commands } = require("../command");
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, runtime, sleep, fetchJson } = require("../lib/functions");
 
-cmd({
-    pattern: "play2",
-    alias: ["ytmp3", "audio"],
-    desc: "Download songs",
-    category: "download",
-    react: "🎵",
-    filename: __filename
-}, async (conn, mek, m, { from, quoted, body, args, q, reply }) => {
-    try {
-        if (!q) return reply("*Please provide a link or a name 🔎...*");
+// Command 
+const leaveCommand = {
+  pattern: "leavee",  // command 
+  react: '🔓',  // react
+  alias: "lefft",  // secend command
+  desc: "To leave from the group",  // Description
+  category: "group",  // Category
+  use: '.leave',  // Usage
+  filename: __filename  // Filename
+};
 
-        // Search for the song on YouTube
-        const search = await yts(q);
-        const data = search.videos[0];
-        const url = data.url;
+// Register the command
+cmd(leaveCommand, async (client, message, chat, options) => {
+  try {
+    // Define the error messages directly
+    const onlyGroupMessage = "This command can only be used in groups.";
+    const onlyOwnerMessage = "Only the bot owner can use this command.";
 
-        let desc = `╭━━━〔 *KHANX-MD* 〕━━━┈⊷
-┃▸ *Title*: ${data.title}
-┃▸ *Views*: ${data.views}
-┃▸ *Duration*: ${data.timestamp}
-┃▸ *Link*: ${data.url}
-╰━━━━━━━━━━━━━━━⪼`;
-        await conn.sendMessage(from, { image: { url: data.thumbnail }, caption: desc }, { quoted: mek });
-
-        // Download the audio using yt-dlp
-        exec(`yt-dlp -x --audio-format mp3 -o "downloaded/%(title)s.%(ext)s" "${url}"`, async (error, stdout, stderr) => {
-            if (error) {
-                return reply("An error occurred while downloading the audio.");
-            }
-
-            const filePath = `downloaded/${data.title}.mp3`;
-            await conn.sendMessage(from, { audio: { url: filePath }, mimetype: "audio/mpeg" }, { quoted: mek });
-        });
-    } catch (e) {
-        reply(`${e}`);
+    // Check if the command is executed in a group
+    if (!options.isGroup) {
+      return message.reply(onlyGroupMessage);  // Reply if not in a group
     }
+    
+    // Check if the user is the owner or admin
+    if (!options.isAdmins && !options.isOwner) {
+      return message.reply(onlyOwnerMessage);  // Reply if not an admin or owner
+    }
+    
+    // Send a goodbye message
+    const goodbyeMessage = { text: "*Good Bye All* 👋🏻" };
+    const quotedMessage = { quoted: message };  // Reference the original message
+    await client.sendMessage(chat.from, goodbyeMessage, quotedMessage);
+    
+    // Command to leave the group
+    await client.groupLeave(chat.from);
+
+  } catch (error) {
+    // Error handling
+    const errorReaction = { text: '❌', key: message.key };
+    const reactError = { react: errorReaction };
+    await client.sendMessage(chat.from, reactError);
+    console.error(error);  // Log the error
+    message.reply("❌ *Error occurred!* \n\n" + error);
+  }
 });
