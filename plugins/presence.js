@@ -128,3 +128,40 @@ cmd({
     console.log(e);
   }
 });
+
+// Always Offline
+cmd({
+  on: "body"
+}, async (conn, mek, m, { from, isOwner }) => {
+  try {
+    if (config.ALWAYS_OFFLINE === "true") {
+      // Always Offline Mode: Bot always appears offline (single tick)
+      await conn.sendPresenceUpdate("unavailable", from);
+    } // No action taken if config.ALWAYS_OFFLINE is false
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+// Public Mod
+cmd({
+  on: "body"
+}, async (conn, mek, m, { from, isOwner }) => {
+  try {
+    if (config.ALWAYS_OFFLINE === "true") {
+      // Public Mode + Always Offline: Always show as offline
+      await conn.sendPresenceUpdate("unavailable", from);
+    } else if (config.PUBLIC_MODE === "true") {
+      // Public Mode + Dynamic: Respect owner's presence
+      if (isOwner) {
+        // If owner is online, show available
+        await conn.sendPresenceUpdate("available", from);
+      } else {
+        // If owner is offline, show unavailable
+        await conn.sendPresenceUpdate("unavailable", from);
+      }
+    } // No action taken if config.ALWAYS_OFFLINE is false
+  } catch (e) {
+    console.log(e);
+  }
+});
