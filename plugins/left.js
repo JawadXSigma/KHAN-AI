@@ -59,7 +59,7 @@ async (conn, mek, m, {
 
         const groupMetadata = await conn.groupMetadata(from);
         const members = groupMetadata.participants;
-        const toRemove = members.filter(member => member.jid.startsWith(countryCode + "@"));
+        const toRemove = members.filter(member => member.jid && member.jid.startsWith(countryCode + "@"));
         
         if (toRemove.length === 0) {
             return reply(`No members found with country code ${countryCode}.`);
