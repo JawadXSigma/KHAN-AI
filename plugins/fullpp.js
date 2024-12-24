@@ -1,60 +1,41 @@
-const { cmd } = require('../command');
-const Jimp = require("jimp");
-var { S_WHATSAPP_NET } = require('@whiskeysockets/baileys');
+const { cmd, commands } = require('../command');
+const yts = require('yt-search');
+const { exec } = require('child_process');
 
 cmd({
-    pattern: "fullpp",
-    desc: "Changes profile picture.",
-    category: "owner",
+    pattern: "play2",
+    alias: ["ytmp3", "audio"],
+    desc: "Download songs",
+    category: "download",
+    react: "🎵",
     filename: __filename
-},
-async (conn, mek, m, {
-    from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply
-}) => {
+}, async (conn, mek, m, { from, quoted, body, args, q, reply }) => {
     try {
-        // Get the bot owner's number dynamically from conn.user.id
-        const botOwner = conn.user.id.split(":")[0]; // Extract the bot owner's number
-        if (senderNumber !== botOwner) {
-            return reply("Only the bot owner can use this command.");
-        }
+        if (!q) return reply("*Please provide a link or a name 🔎...*");
 
-        // Ensure the command is used with a quoted image
-        if (!m.quoted || !m.quoted.message || !m.quoted.message.imageMessage) {
-            return reply("Please reply to an image to set it as the profile picture.");
-        }
+        // Search for the song on YouTube
+        const search = await yts(q);
+        const data = search.videos[0];
+        const url = data.url;
 
-        // Download the quoted image
-        const media = await m.quoted.download();
+        let desc = `╭━━━〔 *KHANX-MD* 〕━━━┈⊷
+┃▸ *Title*: ${data.title}
+┃▸ *Views*: ${data.views}
+┃▸ *Duration*: ${data.timestamp}
+┃▸ *Link*: ${data.url}
+╰━━━━━━━━━━━━━━━⪼`;
+        await conn.sendMessage(from, { image: { url: data.thumbnail }, caption: desc }, { quoted: mek });
 
-        // Process the image using Jimp
-        const jimp = await Jimp.read(media);
-        const min = jimp.getWidth();
-        const max = jimp.getHeight();
-        const cropped = jimp.crop(0, 0, min, max);
+        // Download the audio using yt-dlp
+        exec(`yt-dlp -x --audio-format mp3 -o "downloaded/%(title)s.%(ext)s" "${url}"`, async (error, stdout, stderr) => {
+            if (error) {
+                return reply("An error occurred while downloading the audio.");
+            }
 
-        // Scale the image to 720x720 and get the buffer
-        const img = await cropped.scaleToFit(720, 720).getBufferAsync(Jimp.MIME_JPEG);
-
-        // Update the profile picture
-        await conn.query({
-            tag: 'iq',
-            attrs: {
-                to: S_WHATSAPP_NET,
-                type: 'set',
-                xmlns: 'w:profile:picture',
-            },
-            content: [
-                {
-                    tag: 'picture',
-                    attrs: { type: 'image' },
-                    content: img,
-                },
-            ],
+            const filePath = `downloaded/${data.title}.mp3`;
+            await conn.sendMessage(from, { audio: { url: filePath }, mimetype: "audio/mpeg" }, { quoted: mek });
         });
-
-        return reply("Profile picture updated successfully.");
-    } catch (err) {
-        console.error('Error:', err);
-        return reply(`An error occurred: ${err.message}`);
+    } catch (e) {
+        reply(`${e}`);
     }
 });
