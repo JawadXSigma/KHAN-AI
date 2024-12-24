@@ -16,6 +16,7 @@
     "pino": "^7.0.5",
     "pm2": "^5.2.0",
     "util": "^0.12.4",
+    "jimp": "^0.16.13",
     "express": "latest",
     "axios": "^1.2.5",
     "crypto-digest-sync": "^1.0.0",
