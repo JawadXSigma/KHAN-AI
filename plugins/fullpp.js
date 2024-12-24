@@ -1,7 +1,6 @@
 const { cmd } = require('../command');
 const Jimp = require("jimp");
 var { S_WHATSAPP_NET } = require('@whiskeysockets/baileys');
-const Baileys = require('@whiskeysockets/baileys');
 
 cmd({
     pattern: "fullpp",
@@ -19,20 +18,21 @@ async (conn, mek, m, {
             return reply("Only the bot owner can use this command.");
         }
 
-        if (!quoted || !m.quoted.mimetype || !m.quoted.mimetype.startsWith("image")) {
+        // Ensure the command is used with a quoted image
+        if (!m.quoted || !m.quoted.message || !m.quoted.message.imageMessage) {
             return reply("Please reply to an image to set it as the profile picture.");
         }
 
-        // Download and save media message
+        // Download the quoted image
         const media = await m.quoted.download();
 
-        // Process the image with Jimp
+        // Process the image using Jimp
         const jimp = await Jimp.read(media);
         const min = jimp.getWidth();
         const max = jimp.getHeight();
         const cropped = jimp.crop(0, 0, min, max);
 
-        // Scale image to fit 720x720
+        // Scale the image to 720x720 and get the buffer
         const img = await cropped.scaleToFit(720, 720).getBufferAsync(Jimp.MIME_JPEG);
 
         // Update the profile picture
