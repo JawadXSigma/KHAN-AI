@@ -1,9 +1,8 @@
-const config = require('../config');
+const Jimp = require('jimp');
 const { cmd } = require('../command');
 const { getRandom } = require('../lib/functions');
-const sharp = require('sharp'); // For converting webp to other formats
 
-var imgmsg = 'Please mention a sticker!!';
+var imgmsg = 'Please mention a sticker!';
 var descg = 'This command converts a sticker to an image.';
 
 cmd({
@@ -22,12 +21,12 @@ cmd({
             const stickerBuffer = await m.quoted.download();
             const namePng = getRandom('.png'); // Output file name
 
-            // Convert webp sticker to PNG
-            const imageBuffer = await sharp(stickerBuffer).png().toBuffer();
-            await require('fs').promises.writeFile(namePng, imageBuffer);
+            // Convert webp sticker to PNG using Jimp
+            const image = await Jimp.read(stickerBuffer);
+            await image.writeAsync(namePng);
 
             // Send the converted image
-            await conn.sendMessage(from, { image: imageBuffer, caption: 'Here is your image!' }, { quoted: mek });
+            await conn.sendMessage(from, { image: { url: namePng }, caption: 'Here is your image!' }, { quoted: mek });
         } else {
             return await reply(imgmsg);
         }
