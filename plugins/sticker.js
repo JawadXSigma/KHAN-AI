@@ -3,13 +3,9 @@ const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const { cmd } = require('../command');
 const { getRandom } = require('../lib/functions');
 
-var imgmsg = '';
-if (config.LANG === 'SI') imgmsg = 'Please mention a photo!!';
-else imgmsg = 'ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴘʜᴏᴛᴏ ғᴏʀ sᴛɪᴄᴋᴇʀ!';
+var imgmsg = 'Please mention a photo!!';
 
-var descg = '';
-if (config.LANG === 'SI') descg = 'converts the replied photo to a sticker.';
-else descg = 'ɪᴛ ᴄᴏɴᴠᴇʀᴛs ʏᴏᴜʀ ʀᴇᴘʟɪᴇᴅ ᴘʜᴏᴛᴏ ᴛᴏ sᴛɪᴄᴋᴇʀ.';
+var descg = 'ɪᴛ ᴄᴏɴᴠᴇʀᴛs ʏᴏᴜʀ ʀᴇᴘʟɪᴇᴅ ᴘʜᴏᴛᴏ ᴛᴏ sᴛɪᴄᴋᴇʀ.';
 
 cmd({
     pattern: 'sticker',
@@ -30,7 +26,7 @@ cmd({
             await require('fs').promises.writeFile(nameJpg, imageBuffer);
 
             let sticker = new Sticker(nameJpg, {
-                pack: pushname, // The pack name
+                pack: config.OWNER_NAME, // The pack name
                 author: '', // The author name
                 type: q.includes('--crop') || q.includes('-c') ? StickerTypes.CROPPED : StickerTypes.FULL,
                 categories: ['🤩', '🎉'], // The sticker category
@@ -47,7 +43,7 @@ cmd({
             await require('fs').promises.writeFile(nameWebp, stickerBuffer);
 
             let sticker = new Sticker(nameWebp, {
-                pack: pushname, // The pack name
+                pack: config.OWNER_NAME, // The pack name
                 author: '', // The author name
                 type: q.includes('--crop') || q.includes('-c') ? StickerTypes.CROPPED : StickerTypes.FULL,
                 categories: ['🤩', '🎉'], // The sticker category
