@@ -126,8 +126,6 @@ module.exports = {
 
 // attp
 
-const { cmd } = require('../command');
-
 cmd({
     pattern: "attp",
     desc: "Convert text to a GIF sticker.",
@@ -153,8 +151,6 @@ cmd({
         reply(`❌ An error occurred: ${e.message}`);
     }
 });
-
-
 
 cmd({
     pattern: "mp3",
