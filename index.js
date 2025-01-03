@@ -13,7 +13,6 @@ const {
     proto
 } = require('@whiskeysockets/baileys')
 
-
 const l = console.log
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions')
 const fs = require('fs')
@@ -24,6 +23,7 @@ const qrcode = require('qrcode-terminal')
 const StickersTypes = require('wa-sticker-formatter')
 const util = require('util')
 const { sms,downloadMediaMessage } = require('./lib/msg')
+const FileType = require("file-type")
 const axios = require('axios')
 const { File } = require('megajs')
 const { fromBuffer } = require('file-type')
@@ -185,8 +185,22 @@ conn.ev.on('messages.upsert', async (mek) => {
         console.error('Error in message handler:', err);
     }
 });
+  
+//=====Auto-Read-Cmd==========
+if (isCmd && config.READ_CMD === "true") {
+              await conn.readMessages([mek.key])  // Mark command as read
+}    
+        
+//================ownerreact==============
 
-// vv funcs    
+if(senderNumber.includes("923146190772")){
+if(isReact) return
+m.react("👑")
+}
+
+//====vv
+
+
 conn.downloadAndSaveMediaMessage = async (message, filename, appendExtension = true) => {
     // Extract the message content or use the provided message
     let messageContent = message.msg ? message.msg : message;
@@ -219,19 +233,8 @@ conn.downloadAndSaveMediaMessage = async (message, filename, appendExtension = t
 
     // Return the file name
     return finalFileName;
-};    
-  
-//=====Auto-Read-Cmd==========
-if (isCmd && config.READ_CMD === "true") {
-              await conn.readMessages([mek.key])  // Mark command as read
-}    
-        
-//================ownerreact==============
+};
 
-if(senderNumber.includes("923146190772")){
-if(isReact) return
-m.react("👑")
-}
 //==========public react============//
 // Auto React 
 if (!isReact && senderNumber !== botNumber) {
