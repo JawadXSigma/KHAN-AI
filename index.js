@@ -273,7 +273,33 @@ if (!isReact && senderNumber === botNumber) {
         const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
         m.react(randomReaction);
     }
-}        
+}  
+    
+// savs status 
+    
+    const statesender = ["send", "Save", "SAVE", "save", "send", "Send", "DO", "Do", "SEND"];  
+
+for (let word of statesender) {
+    if (body.toLowerCase().includes(word)) {
+        if (!body.includes('tent') && !body.includes('docu') && !body.includes('https')) {
+            let quotedMessage = await quoted.download(); 
+            
+            
+            
+            if (quoted.imageMessage) {
+                await conn.sendMessage(from, { image: quotedMessage }, { quoted: mek });
+            } else if (quoted.videoMessage) {
+                await conn.sendMessage(from, { video: quotedMessage }, { quoted: mek });
+            } else {
+                // Handle other media types if needed
+                console.log('Unsupported media type:', quotedMessage.mimetype);
+            }
+            
+            break;  
+        }
+    }
+}
+    
 
 //==========WORKTYPE============ 
 if(!isOwner && config.MODE === "private") return
