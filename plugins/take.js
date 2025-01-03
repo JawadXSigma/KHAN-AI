@@ -1,70 +1,66 @@
+const config = require('../config');
+const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const { cmd } = require('../command');
-const { Sticker } = require('wa-sticker-formatter');
+const { getRandom } = require('../lib/functions');
 
-/**
- * Rename the sticker pack of a given sticker buffer.
- * 
- * @param {Buffer} stickerBuffer - The original sticker buffer.
- * @param {string} packName - The new pack name.
- * @param {string} [authorName] - The author name (optional).
- * @returns {Buffer} - The updated sticker buffer with the new pack name.
- */
-async function renameStickerPack(stickerBuffer, packName, authorName = 'Bot') {
-    try {
-        // Create a new sticker with the updated pack name
-        const sticker = new Sticker(stickerBuffer, {
-            pack: packName, // New pack name
-            author: authorName, // Author name
-            type: Sticker.Types.FULL, // Retain original sticker type
-            quality: 75 // Output quality
-        });
+var imgmsg = 'Please mention a photo!!';
 
-        // Convert to buffer
-        return await sticker.toBuffer();
-    } catch (error) {
-        console.error('Error renaming sticker pack:', error);
-        throw new Error('Failed to rename sticker pack.');
-    }
-}
+var descg = 'ɪᴛ ᴄᴏɴᴠᴇʀᴛs ʏᴏᴜʀ ʀᴇᴘʟɪᴇᴅ ᴘʜᴏᴛᴏ ᴛᴏ sᴛɪᴄᴋᴇʀ.';
 
 cmd({
     pattern: 'take',
-    react: '✍️',
-    alias: ['rename'],
-    desc: 'Rename sticker pack name.',
+    react: '🤹‍♀️',
+    alias: ['s', 'ss', 'stic'],
+    desc: descg,
     category: 'convert',
-    use: '.take <new pack name>',
+    use: '.sticker <Reply to image> <Pack Name>',
     filename: __filename
-}, async (conn, mek, m, { from, reply, q }) => {
+}, async (conn, mek, m, { from, reply, isCmd, command, args, q, isGroup, pushname }) => {
     try {
-        // Check if the message is a reply to a sticker
+        const isQuotedImage = m.quoted && (m.quoted.type === 'imageMessage' || (m.quoted.type === 'viewOnceMessage' && m.quoted.msg.type === 'imageMessage'));
         const isQuotedSticker = m.quoted && m.quoted.type === 'stickerMessage';
 
-        if (!isQuotedSticker) {
-            return await reply('⚠️ Please reply to a sticker to rename it!');
+        const packName = q.trim() || 'Sticker Pack'; // Use user-provided pack name or default
+
+        if ((m.type === 'imageMessage') || isQuotedImage) {
+            const nameJpg = getRandom('.jpg');
+            const imageBuffer = isQuotedImage ? await m.quoted.download() : await m.download();
+            await require('fs').promises.writeFile(nameJpg, imageBuffer);
+
+            let sticker = new Sticker(nameJpg, {
+                pack: packName, // Custom pack name
+                author: '', // The author name
+                type: args.includes('--crop') || args.includes('-c') ? StickerTypes.CROPPED : StickerTypes.FULL,
+                categories: ['🤩', '🎉'], // The sticker category
+                id: '12345', // The sticker id
+                quality: 75, // The quality of the output file
+                background: 'transparent', // The sticker background color (only for full stickers)
+            });
+
+            const buffer = await sticker.toBuffer();
+            return conn.sendMessage(from, { sticker: buffer }, { quoted: mek });
+        } else if (isQuotedSticker) {
+            const nameWebp = getRandom('.webp');
+            const stickerBuffer = await m.quoted.download();
+            await require('fs').promises.writeFile(nameWebp, stickerBuffer);
+
+            let sticker = new Sticker(nameWebp, {
+                pack: packName, // Custom pack name
+                author: '', // The author name
+                type: args.includes('--crop') || args.includes('-c') ? StickerTypes.CROPPED : StickerTypes.FULL,
+                categories: ['🤩', '🎉'], // The sticker category
+                id: '12345', // The sticker id
+                quality: 75, // The quality of the output file
+                background: 'transparent', // The sticker background color (only for full stickers)
+            });
+
+            const buffer = await sticker.toBuffer();
+            return conn.sendMessage(from, { sticker: buffer }, { quoted: mek });
+        } else {
+            return await reply(imgmsg);
         }
-
-        if (!q) {
-            return await reply('⚠️ Please provide a new pack name!\nUsage: `.take <new pack name>`');
-        }
-
-        // Download the quoted sticker buffer
-        const stickerBuffer = await m.quoted.download();
-        if (!stickerBuffer) {
-            return await reply('⚠️ Failed to download the sticker. Please try again.');
-        }
-
-        // Rename the sticker pack
-        const renamedStickerBuffer = await renameStickerPack(stickerBuffer, q.trim());
-        if (!renamedStickerBuffer) {
-            return await reply('❌ Error creating the new sticker. Please check the input format.');
-        }
-
-        // Send the renamed sticker back
-        await conn.sendMessage(from, { sticker: renamedStickerBuffer }, { quoted: mek });
-
     } catch (e) {
-        console.error('Error renaming sticker pack:', e);
-        reply(`❌ Error renaming sticker pack: ${e.message}`);
+        reply('Error !!');
+        console.error(e);
     }
 });
