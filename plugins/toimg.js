@@ -2,8 +2,8 @@ const Jimp = require('jimp');
 const { cmd } = require('../command');
 const { getRandom } = require('../lib/functions');
 
-var imgmsg = 'Please mention a sticker!';
-var descg = 'This command converts a sticker to an image.';
+var imgmsg = 'Please reply to a sticker!';
+var descg = 'Converts a sticker to an image.';
 
 cmd({
     pattern: 'sticker2img',
@@ -19,19 +19,19 @@ cmd({
 
         if (isQuotedSticker) {
             const stickerBuffer = await m.quoted.download();
-            const namePng = getRandom('.png'); // Output file name
+            const namePng = getRandom('.png'); // Generate random filename for PNG output
 
-            // Convert webp sticker to PNG using Jimp
+            // Convert sticker buffer to PNG image using Jimp
             const image = await Jimp.read(stickerBuffer);
-            await image.writeAsync(namePng);
+            await image.writeAsync(namePng); // Save the processed image
 
-            // Send the converted image
+            // Send the converted image back
             await conn.sendMessage(from, { image: { url: namePng }, caption: 'Here is your image!' }, { quoted: mek });
         } else {
             return await reply(imgmsg);
         }
     } catch (e) {
-        reply('Error while converting sticker to image!');
-        console.error(e);
+        console.error('Error while converting sticker to image:', e);
+        reply('Error while converting sticker to image! Please ensure you are replying to a valid sticker.');
     }
 });
