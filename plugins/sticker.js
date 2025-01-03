@@ -62,3 +62,42 @@ cmd({
         console.error(e);
     }
 });
+
+// take cmd 
+
+cmd({
+    pattern: 'take',
+    react: '🤹‍♀️',
+    desc: descTake,
+    category: 'convert',
+    use: '.take <name>',
+}, async (conn, mek, m, { from, reply, isCmd, command, args }) => {
+    try {
+        const name = args[0] || 'default'; // Use provided name or default to 'default'
+        const isQuotedSticker = m.quoted && m.quoted.type === 'stickerMessage';
+
+        if (isQuotedSticker) {
+            const stickerBuffer = await m.quoted.download();
+            const nameWebp = getRandom('.webp');
+            await require('fs').promises.writeFile(nameWebp, stickerBuffer);
+
+            let sticker = new Sticker(nameWebp, {
+                pack: name, // Use the user-provided name
+                author: '', // Author remains empty
+                type: StickerTypes.FULL,
+                categories: ['🤩', '🎉'],
+                id: '12345',
+                quality: 75,
+                background: 'transparent',
+            });
+
+            const buffer = await sticker.toBuffer();
+            return conn.sendMessage(from, { sticker: buffer }, { quoted: mek });
+        } else {
+            return await reply('Please reply to a sticker to use this command.');
+        }
+    } catch (e) {
+        reply('Error !!');
+        console.error(e);
+    }
+});
