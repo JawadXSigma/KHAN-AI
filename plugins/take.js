@@ -3,14 +3,14 @@ const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const { cmd } = require('../command');
 const { getRandom } = require('../lib/functions');
 
-var imgmsg = 'Please mention a photo!!';
+var imgmsg = 'Please mention a photo or sticker!!';
+var usageMsg = 'Usage: .take <Pack Name>';
 
-var descg = 'ɪᴛ ᴄᴏɴᴠᴇʀᴛs ʏᴏᴜʀ ʀᴇᴘʟɪᴇᴅ ᴘʜᴏᴛᴏ ᴛᴏ sᴛɪᴄᴋᴇʀ.';
+var descg = 'give pack name to sticker .';
 
 cmd({
     pattern: 'take',
-    react: '🤹‍♀️',
-    alias: ['s', 'ss', 'stic'],
+    react: '⭐',
     desc: descg,
     category: 'convert',
     use: '.sticker <Reply to image> <Pack Name>',
@@ -20,7 +20,11 @@ cmd({
         const isQuotedImage = m.quoted && (m.quoted.type === 'imageMessage' || (m.quoted.type === 'viewOnceMessage' && m.quoted.msg.type === 'imageMessage'));
         const isQuotedSticker = m.quoted && m.quoted.type === 'stickerMessage';
 
-        const packName = q.trim() || 'Sticker Pack'; // Use user-provided pack name or default
+        let packName = args[0] ? args.join(' ') : null; // Get custom pack name or null
+
+        if (!packName) {
+            return reply(usageMsg); // Prompt user if pack name is missing
+        }
 
         if ((m.type === 'imageMessage') || isQuotedImage) {
             const nameJpg = getRandom('.jpg');
