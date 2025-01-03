@@ -185,6 +185,41 @@ conn.ev.on('messages.upsert', async (mek) => {
         console.error('Error in message handler:', err);
     }
 });
+
+// vv funcs    
+conn.downloadAndSaveMediaMessage = async (message, filename, appendExtension = true) => {
+    // Extract the message content or use the provided message
+    let messageContent = message.msg ? message.msg : message;
+
+    // Extract the MIME type of the message, default to an empty string if not available
+    let mimeType = (message.msg || message).mimetype || '';
+
+    // Determine the media type (e.g., "image", "video") by checking the MIME type or message type
+    let mediaType = message.mtype ? message.mtype.replace(/Message/gi, '') : mimeType.split('/')[0];
+
+    // Download the content of the message as a stream
+    const mediaStream = await downloadContentFromMessage(messageContent, mediaType);
+
+    // Initialize an empty buffer to store the downloaded data
+    let mediaBuffer = Buffer.from([]);
+
+    // Concatenate the data chunks into the buffer
+    for await (const chunk of mediaStream) {
+        mediaBuffer = Buffer.concat([mediaBuffer, chunk]);
+    }
+
+    // Detect the file type and extension from the buffer
+    let detectedFileType = await FileType.fromBuffer(mediaBuffer);
+
+    // Construct the file name, optionally appending the detected file extension
+    let finalFileName = appendExtension ? `${filename}.${detectedFileType.ext}` : filename;
+
+    // Save the buffer to the file
+    await fs.writeFileSync(finalFileName, mediaBuffer);
+
+    // Return the file name
+    return finalFileName;
+};    
   
 //=====Auto-Read-Cmd==========
 if (isCmd && config.READ_CMD === "true") {
