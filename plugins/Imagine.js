@@ -1,99 +1,39 @@
+const axios = require("axios");
+const config = require('../config');
 const { cmd } = require('../command');
-const axios = require('axios');
 
 cmd({
-    pattern: "flux",
-    alias: ["fluximage", "fluxgen"],
-    react: '🎨',
-    desc: "Generate an AI image using the Flux API.",
-    category: "ai",
-    use: '.flux <prompt>',
-    filename: __filename
-},
-async (conn, mek, m, { from, args, reply }) => {
-    try {
-        const prompt = args.join(" ");
-        if (!prompt) {
-            return reply("❌ *Please provide a prompt to generate an image.*");
-        }
+  pattern: "sss",
+  alias: ["ssweb"],
+  desc: "Download screenshot of a given link.",
+  category: "other",
+  use: ".ss <link>",
+  filename: __filename,
+}, 
+async (conn, mek, m, {
+  from, l, quoted, body, isCmd, command, args, q, isGroup, sender, 
+  senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, 
+  groupMetadata, groupName, participants, isItzcp, groupAdmins, 
+  isBotAdmins, isAdmins, reply 
+}) => {
+  if (!q) {
+    return reply("Please provide a URL to capture a screenshot.");
+  }
 
-        // Inform the user
-        reply(`*🎨 Generating an image for:* "${prompt}"`);
+  try {
+    // Make a GET request to the API
+    const response = await axios.get(`https://api.davidcyriltech.my.id/ssweb?url=${q}`);
+    const screenshotUrl = response.data.screenshotUrl;
 
-        // Call the Flux API
-        const apiUrl = `https://api.davidcyriltech.my.id/flux?prompt=${encodeURIComponent(prompt)}`;
-        const response = await axios.get(apiUrl);
+    // Send the screenshot to the chat
+    const imageMessage = {
+      image: { url: screenshotUrl },
+      caption: "*KHAN-MD WEB SS DOWNLOADER*\n\n> *© Powered By JawadTechX*",
+    };
 
-        if (!response.data || !response.data.success) {
-            return reply("❌ Failed to generate the image. Please try again later.");
-        }
-
-        const imageUrl = response.data.url;
-
-        if (!imageUrl) {
-            return reply("❌ No image URL found in the response. Please check the API.");
-        }
-
-        // Send the generated image
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: imageUrl },
-                caption: `*🎨 Image Generated (Flux) for:* "${prompt}"`
-            },
-            { quoted: mek }
-        );
-    } catch (error) {
-        console.error("Error generating Flux image:", error.message);
-        reply("❌ An error occurred while generating the image.");
-    }
-});
-
-
-cmd({
-    pattern: "diffusion",
-    alias: ["difimage", "diff"],
-    react: '🎨',
-    desc: "Generate an AI image using the Diffusion API.",
-    category: "ai",
-    use: '.diffusion <prompt>',
-    filename: __filename
-},
-async (conn, mek, m, { from, args, reply }) => {
-    try {
-        const prompt = args.join(" ");
-        if (!prompt) {
-            return reply("❌ *Please provide a prompt to generate an image.*");
-        }
-
-        // Inform the user
-        reply(`*🎨 Generating an image for:* "${prompt}"`);
-
-        // Call the Diffusion API
-        const apiUrl = `https://api.davidcyriltech.my.id/diffusion?prompt=${encodeURIComponent(prompt)}`;
-        const response = await axios.get(apiUrl);
-
-        if (!response.data || !response.data.success) {
-            return reply("❌ Failed to generate the image. Please try again later.");
-        }
-
-        const imageUrl = response.data.url;
-
-        if (!imageUrl) {
-            return reply("❌ No image URL found in the response. Please check the API.");
-        }
-
-        // Send the generated image
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: imageUrl },
-                caption: `*🎨 Image Generated (Diffusion) for:* "${prompt}"`
-            },
-            { quoted: mek }
-        );
-    } catch (error) {
-        console.error("Error generating Diffusion image:", error.message);
-        reply("❌ An error occurred while generating the image.");
-    }
+    await conn.sendMessage(from, imageMessage, { quoted: m });
+  } catch (error) {
+    console.error(error);
+    reply("Failed to capture the screenshot. Please try again.");
+  }
 });
